@@ -10,5 +10,16 @@ services:
         target: 3000
     volumes:
       - .:/app/
+    env_file:
+      - .env
     environment:
       JWT_SECRET: ${JWT_SECRET}
+    links:
+      - mongo  
+  mongo:
+    container_name: mongo
+    image: mongo
+    volumes:
+      - ./data:/data/db
+    ports:
+      - '27017:27017'
