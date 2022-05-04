@@ -1,4 +1,7 @@
 const jwt = require("jsonwebtoken");
+const mm = require("micromatch");
+const HttpException = require("./utils/httpException");
+require('dotenv').config()
 
 const users = [
   {
@@ -41,7 +44,30 @@ const authFactory = (secret) => (username, password) => {
   );
 };
 
+const tokenSecret = process.env.JWT_SECRET;
+
+function authCheck(req, res, next) {
+  //skip if request matches white listed patterns
+  if (!mm.contains(req.path, ["/auth"])) {
+    let authHeader = req.headers.authorization;
+    if (!authHeader) {
+      next(new HttpException(403, "Unauthorized"));
+    } else {
+      const [__, token] = authHeader.split(" ");
+
+      try {
+        req.user = jwt.verify(token, tokenSecret);
+      } catch (e) {
+        console.log(e);
+        next(new HttpException(403, "Unauthorized"));
+      }
+    }
+  }
+  next();
+}
+
 module.exports = {
   authFactory,
   AuthError,
+  authCheck,
 };
