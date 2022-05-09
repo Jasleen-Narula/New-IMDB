@@ -1,4 +1,4 @@
-# Node.js recruitment task
+# Node.js task
 
 We'd like you to build a simple Movie API. It should provide two endpoints:
 
